@@ -1,72 +1,39 @@
 import streamlit as st
 import edge_tts
 import asyncio
-import os
-import tempfile
-import shutil
 
-try:
-    from pydub import AudioSegment
-    PYDUB_AVAILABLE = True
-except ImportError:
-    PYDUB_AVAILABLE = False
+st.set_page_config(page_title="My Voice App", page_icon="🗣️")
+st.title("မြန်မာ AI အသံထွက် (အကန့်အသတ်မရှိ)")
 
-st.set_page_config(page_title="StoryLoop MM Voice", page_icon="🎙️")
-st.title("🎙️ StoryLoop MM - AI Voice App")
-st.write("အသံပြောင်းလိုသော စာသားများကို အောက်တွင် ရေးပါ သို့မဟုတ် Paste လုပ်ပါ။")
+# ဒီနေရာမှာ max_chars မထည့်ထားတဲ့အတွက် စာလုံးရေ အကန့်အသတ်မရှိ (စာအုပ်တစ်အုပ်စာအထိ) ထည့်လို့ရပါပြီ
+text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=350)
 
-text_input = st.text_area("စာသားထည့်ရန် အကွက်", height=200)
+col1, col2 = st.columns(2)
+with col1:
+    voice_option = st.radio("အသံရွေးချယ်ပါ", ["အမျိုးသမီးအသံ (Nilar)", "အမျိုးသားအသံ (Thiha)"])
+    voice_code = "my-MM-NilarNeural" if voice_option == "အမျိုးသမီးအသံ (Nilar)" else "my-MM-ThihaNeural"
 
-voice_choice = st.selectbox(
-    "အသံရွေးချယ်ပါ",
-    options=["my-MM-ThihaNeural", "my-MM-NilarNeural"],
-    format_func=lambda x: "👨 ယောကျ်ားလေးအသံ (Thiha)" if x == "my-MM-ThihaNeural" else "👩 မိန်းကလေးအသံ (Nilar)"
-)
+with col2:
+    # အသံ အနှေးအမြန် ချိန်ညှိရန် (အနှုတ်ပြလျှင် နှေးမည်၊ အပေါင်းပြလျှင် မြန်မည်)
+    # -15% သည် လူပြောသည့်အသံနှုန်းနှင့် အနီးစပ်ဆုံးဖြစ်သည်
+    speed = st.slider("အသံ အနှေး/အမြန် ချိန်ညှိရန်", -50, 50, -15)
+    rate_str = f"{speed:+d}%"
 
-if st.button("အသံဖိုင် ဖန်တီးပါ", type="primary"):
-    if not text_input.strip():
-        st.warning("ကျေးဇူးပြု၍ စာသားတစ်ခုခု ရေးထည့်ပါ။")
-    else:
-        with st.spinner("⏳ အသံဖန်တီးနေပါသည်... ခဏစောင့်ပါ။ (စာသားရှည်ပါက အချိန်အနည်းငယ် ကြာနိုင်ပါသည်)"):
-            async def generate_audio():
-                paragraphs = [p.strip() for p in text_input.split('\n') if p.strip()]
-                temp_dir = tempfile.mkdtemp()
-                temp_files = []
-                final_path = os.path.join(temp_dir, "AI_Voice.mp3")
+async def create_audio(text, voice, rate):
+    communicate = edge_tts.Communicate(text, voice, rate=rate)
+    await communicate.save("output.mp3")
+
+if st.button("အသံဖန်တီးပါ (Generate Audio)"):
+    if text_input.strip():
+        with st.spinner("အသံအဖြစ်သို့ ပြောင်းလဲနေပါသည်။ စာရှည်ပါက အနည်းငယ် ပိုစောင့်ပေးပါ..."):
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(create_audio(text_input, voice_code, rate_str))
                 
-                try:
-                    # စာပိုဒ်တစ်ခုချင်းစီကို အသံဖန်တီးခြင်း
-                    for i, para in enumerate(paragraphs):
-                        t_file = os.path.join(temp_dir, f"temp_{i}.mp3")
-                        communicate = edge_tts.Communicate(para, voice_choice)
-                        await communicate.save(t_file)
-                        temp_files.append(t_file)
-                    
-                    # အသံဖိုင်များ ပေါင်းခြင်း
-                    if PYDUB_AVAILABLE and len(temp_files) > 1:
-                        final_audio = AudioSegment.empty()
-                        silence = AudioSegment.silent(duration=2000) # ၂ စက္ကန့်စီခြားမည်
-                        for idx, t_file in enumerate(temp_files):
-                            final_audio += AudioSegment.from_mp3(t_file)
-                            if idx < len(temp_files) - 1:
-                                final_audio += silence
-                        final_audio.export(final_path, format="mp3")
-                    else:
-                        shutil.copy(temp_files[0], final_path)
-                    
-                    return final_path
-                except Exception as e:
-                    st.error(f"အမှားအယွင်းဖြစ်နေပါသည်: {e}")
-                    return None
-            
-            output_file = asyncio.run(generate_audio())
-            
-            if output_file and os.path.exists(output_file):
-                st.success("✅ အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ။")
-                with open(output_file, "rb") as f:
-                    st.download_button(
-                        label="📥 အသံဖိုင် (MP3) ဒေါင်းလုဒ်လုပ်ရန်",
-                        data=f,
-                        file_name="AI_Voice.mp3",
-                        mime="audio/mp3"
-                    )
+                st.audio("output.mp3", format="audio/mp3")
+                st.success("အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ!")
+            except Exception as e:
+                st.error(f"အမှားအယွင်းဖြစ်ပေါ်နေပါသည်: {e}")
+    else:
+        st.warning("ကျေးဇူးပြု၍ စာသားအရင်ထည့်ပေးပါ။")
