@@ -3,16 +3,32 @@ import edge_tts
 import asyncio
 import os
 
-st.set_page_config(page_title="My Voice App", page_icon="🗣️")
+# စာမျက်နှာ ဖွဲ့စည်းပုံ
+st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣️")
+
+# --- ဘေးဘက် (Sidebar) တွင် YouTube Channel အကြောင်းထည့်ရန် ---
+st.sidebar.title("✨ ဖန်တီးသူအကြောင်း")
+st.sidebar.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
+st.sidebar.write("ကျွန်တော့်ရဲ့ YouTube Channel မှာလည်း ဗီဒီယိုတွေ ဝင်ရောက်လေ့လာပြီး အားပေးနိုင်ပါတယ်ခင်ဗျာ။ 👇")
+
+# အစ်ကိုပေးထားသော YouTube Link ကို ဤနေရာတွင် ထည့်သွင်းထားပါသည်
+youtube_link = "https://youtube.com/@storyloopmm?si=dzQRoGdPAj_2Quno" 
+
+# YouTube သို့ သွားရန် ခလုတ် (Link)
+st.sidebar.markdown(f"[**▶️ YouTube Channel သို့ သွားရန် နှိပ်ပါ**]({youtube_link})")
+st.sidebar.write("---")
+st.sidebar.caption("Created by: StoryLOOP MM")
+# -----------------------------------------------------------
+
 st.title("မြန်မာ AI အသံထွက် (အကန့်အသတ်မရှိ)")
 
-# အသံဖိုင်မှတ်တမ်းနှင့် နံပါတ်စဉ်ကို မှတ်သားထားရန် (Session State ကို အသုံးပြုခြင်း)
+# အသံဖိုင်မှတ်တမ်းနှင့် နံပါတ်စဉ်ကို မှတ်သားထားရန်
 if "audio_history" not in st.session_state:
     st.session_state.audio_history = []
 if "file_counter" not in st.session_state:
     st.session_state.file_counter = 1
 
-# စာသားထည့်ရန်နေရာ (max_chars မပါဝင်သဖြင့် အကန့်အသတ်မရှိပါ)
+# စာသားထည့်ရန်နေရာ
 text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=250)
 
 col1, col2 = st.columns(2)
@@ -30,7 +46,6 @@ async def create_audio(text, voice, rate, filename):
 
 if st.button("အသံဖန်တီးပါ (Generate Audio)"):
     if text_input.strip():
-        # နာမည်ကို storyloop-0000001, 0000002 စသဖြင့် အလိုအလျောက် ပေးခြင်း
         current_filename = f"storyloop-{st.session_state.file_counter:07d}.mp3"
         
         with st.spinner(f"{current_filename} ကို ပြောင်းလဲနေပါသည်။ ခဏစောင့်ပါ..."):
@@ -39,10 +54,7 @@ if st.button("အသံဖန်တီးပါ (Generate Audio)"):
                 asyncio.set_event_loop(loop)
                 loop.run_until_complete(create_audio(text_input, voice_code, rate_str, current_filename))
                 
-                # ဖန်တီးပြီးသော ဖိုင်နာမည်ကို မှတ်တမ်းထဲသို့ ထည့်ခြင်း
                 st.session_state.audio_history.append(current_filename)
-                
-                # နောက်တစ်ပုဒ်အတွက် နံပါတ်စဉ်တစ်ခု တိုးထားခြင်း
                 st.session_state.file_counter += 1
                 
                 st.success(f"အောင်မြင်ပါသည်။ {current_filename} ကို အောက်တွင် တွေ့နိုင်ပါသည်။")
@@ -57,19 +69,17 @@ if st.session_state.audio_history:
     st.subheader("ဖန်တီးထားသော အသံဖိုင်များ")
     st.caption("ဤနေရာတွင် ယခင်လုပ်ထားသော အသံများကို ပြန်နားထောင်နိုင်၊ ဒေါင်းလုဒ်ဆွဲနိုင်ပါသည်။")
     
-    # ဖိုင်များကို အစဉ်လိုက် အောက်စီဆင်း၍ ပြပေးမည်
     for audio_file in st.session_state.audio_history:
         if os.path.exists(audio_file):
             st.write(f"🔊 **{audio_file}**")
             st.audio(audio_file, format="audio/mp3")
             
-            # ဒေါင်းလုဒ်ဆွဲရန် ခလုတ်
             with open(audio_file, "rb") as file:
                 st.download_button(
                     label=f"⬇️ {audio_file} အား ဒေါင်းလုဒ်ဆွဲရန်",
                     data=file,
                     file_name=audio_file,
                     mime="audio/mp3",
-                    key=audio_file # ခလုတ်တစ်ခုချင်းစီ မတူစေရန် key ပေးခြင်း
+                    key=audio_file
                 )
-            st.write("") # ခြားထားရန်
+            st.write("")
