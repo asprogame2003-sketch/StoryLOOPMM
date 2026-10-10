@@ -6,15 +6,26 @@ import os
 # စာမျက်နှာ ဖွဲ့စည်းပုံ
 st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣️")
 
-# --- 🌟 မျက်နှာပြင် အလယ် (Main Screen) တွင် YouTube Channel ကို ပြသရန် ---
+# --- 🌟 မျက်နှာပြင် အလယ် (Main Screen) ---
 st.title("Myanmar AI Voice (Unlimited)")
 st.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် **StoryLOOP MM** မှ ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
+
+# --- 👥 Use Counter (အသုံးပြုသူ အရေအတွက်ကို အပေါ်ဆုံးတွင် ထင်ရှားစွာပြသရန်) ---
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
+        <p style="font-size: 16px; font-weight: bold;">👥 ယခု App ကို အသုံးပြုပြီးသူ အရေအတွက်</p>
+        <img src="https://profile-counter.glitch.me/storyloopmm_tts/count.svg" alt="User Counter">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+# -----------------------------------------------------------------
 
 # YouTube Link ကို ခလုတ်ကဲ့သို့ ထင်ရှားအောင် ပြသထားခြင်း
 youtube_link = "https://youtube.com/@storyloopmm?si=dzQRoGdPAj_2Quno"
 st.info(f"ဗီဒီယိုများ ဝင်ရောက်လေ့လာရန် 👉 [**▶️ StoryLOOP MM YouTube Channel သို့ သွားရန် နှိပ်ပါ**]({youtube_link})")
 st.write("---")
-# -----------------------------------------------------------------
 
 # --- 💡 အသုံးပြုသူများအတွက် အကြံပြုချက်နှင့် လမ်းညွှန် (ပိတ်ထားပြီး နှိပ်မှပွင့်မည်) ---
 with st.expander("💡 ပိုမိုကောင်းမွန်သော အသံထွက်ရရှိရန် (ဤနေရာကိုနှိပ်၍ ဖတ်ပါ)", expanded=False):
@@ -33,7 +44,7 @@ if "audio_history" not in st.session_state:
 if "file_counter" not in st.session_state:
     st.session_state.file_counter = 1
 
-# စာသားထည့်ရန်နေရာ (အရင်ကထက် ပိုကျယ်အောင် height=400 ဟု ပြင်ထားပါသည်)
+# စာသားထည့်ရန်နေရာ
 text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=400)
 
 # အသံရွေးချယ်ရန် (Radio Button)
@@ -96,4 +107,3 @@ if st.session_state.audio_history:
                     key=audio_file
                 )
             st.write("")
-            
