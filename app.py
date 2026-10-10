@@ -10,12 +10,12 @@ st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣�
 st.title("Myanmar AI Voice (Unlimited)")
 st.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် **StoryLOOP MM** မှ ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
 
-# --- 👀 View Counter (အမည်မသိ ဝင်ရောက်ကြည့်ရှုမှု အကြိမ်အရေအတွက် ကိန်းဂဏန်းသာ ပြသရန်) ---
+# --- 👀 View Counter (အနီရောင် Error မပေါ်စေရန် username ကို ပြင်ထားပါသည်) ---
 st.markdown(
     """
     <div style="text-align: center; margin-top: 5px; margin-bottom: 20px;">
         <p style="font-size: 14px; color: gray;">👀 ဝက်ဘ်ဆိုက် ဝင်ရောက်ကြည့်ရှုမှု (Total Views)</p>
-        <img src="https://komarev.com/ghpvc/?username=storyloopmm_tts_app&label=Views&color=2ea44f&style=flat-square" alt="View Counter">
+        <img src="https://komarev.com/ghpvc/?username=storyloopmm-tts-app&label=Views&color=2ea44f&style=flat-square" alt="View Counter">
     </div>
     """,
     unsafe_allow_html=True
