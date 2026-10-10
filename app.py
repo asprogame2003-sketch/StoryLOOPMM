@@ -2,6 +2,7 @@ import streamlit as st
 import edge_tts
 import asyncio
 import os
+import time
 
 # စာမျက်နှာ ဖွဲ့စည်းပုံ
 st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣️")
@@ -10,12 +11,16 @@ st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣�
 st.title("Myanmar AI Voice (Unlimited)")
 st.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် **StoryLOOP MM** မှ ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
 
-# --- 👀 View Counter (အနီရောင် Error မပေါ်စေရန် username ကို ပြင်ထားပါသည်) ---
+# --- ဝက်ဘ်ဆိုက်ကို တစ်ခါဝင်လျှင် (၁) ကြိမ်သာ Count လုပ်ရန် မှတ်သားခြင်း ---
+if "visit_id" not in st.session_state:
+    st.session_state.visit_id = str(int(time.time()))
+
+# --- 👀 View Counter (Browser တွင် ငြိမနေစေရန်နှင့် ၁ ကြိမ်ဝင် ၁ ကြိမ်သာတက်ရန် ပြင်ထားပါသည်) ---
 st.markdown(
-    """
+    f"""
     <div style="text-align: center; margin-top: 5px; margin-bottom: 20px;">
         <p style="font-size: 14px; color: gray;">👀 ဝက်ဘ်ဆိုက် ဝင်ရောက်ကြည့်ရှုမှု (Total Views)</p>
-        <img src="https://komarev.com/ghpvc/?username=storyloopmm-tts-app&label=Views&color=2ea44f&style=flat-square" alt="View Counter">
+        <img src="https://komarev.com/ghpvc/?username=storyloopmm-tts-app&label=Views&color=2ea44f&style=flat-square&t={st.session_state.visit_id}" alt="View Counter">
     </div>
     """,
     unsafe_allow_html=True
