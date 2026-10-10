@@ -6,23 +6,20 @@ import os
 # စာမျက်နှာ ဖွဲ့စည်းပုံ
 st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣️")
 
-# --- ဘေးဘက် (Sidebar) တွင် YouTube Channel အကြောင်းထည့်ရန် ---
-st.sidebar.title("✨ ဖန်တီးသူအကြောင်း")
-st.sidebar.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
-st.sidebar.write("ကျွန်တော့်ရဲ့ YouTube Channel မှာလည်း ဗီဒီယိုတွေ ဝင်ရောက်လေ့လာပြီး အားပေးနိုင်ပါတယ်ခင်ဗျာ။ 👇")
-
-youtube_link = "https://youtube.com/@storyloopmm?si=dzQRoGdPAj_2Quno" 
-st.sidebar.markdown(f"[**▶️ YouTube Channel သို့ သွားရန် နှိပ်ပါ**]({youtube_link})")
-st.sidebar.write("---")
-st.sidebar.caption("Created by: StoryLOOP MM")
-# -----------------------------------------------------------
-
+# --- 🌟 မျက်နှာပြင် အလယ် (Main Screen) တွင် YouTube Channel ကို ပြသရန် ---
 st.title("Myanmar AI Voice (Unlimited)")
+st.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် **StoryLOOP MM** မှ ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
 
-# --- 💡 အသုံးပြုသူများအတွက် အကြံပြုချက်နှင့် လမ်းညွှန် ---
-with st.expander("💡 အသံအသစ်များ ဖန်တီးနည်းနှင့် အကြံပြုချက်များ (ဖတ်ရန်)", expanded=True):
+# YouTube Link ကို ခလုတ်ကဲ့သို့ ထင်ရှားအောင် ပြသထားခြင်း
+youtube_link = "https://youtube.com/@storyloopmm?si=dzQRoGdPAj_2Quno"
+st.info(f"ဗီဒီယိုများ ဝင်ရောက်လေ့လာရန် 👉 [**▶️ StoryLOOP MM YouTube Channel သို့ သွားရန် နှိပ်ပါ**]({youtube_link})")
+st.write("---")
+# -----------------------------------------------------------------
+
+# --- 💡 အသုံးပြုသူများအတွက် အကြံပြုချက်နှင့် လမ်းညွှန် (ပိတ်ထားပြီး နှိပ်မှပွင့်မည်) ---
+with st.expander("💡 ပိုမိုကောင်းမွန်သော အသံထွက်ရရှိရန် (ဤနေရာကိုနှိပ်၍ ဖတ်ပါ)", expanded=False):
     st.markdown("""
-    - **အသံကို ခဏရပ်စေရန် (Pause):** စာကြောင်းများအကြားတွင် ပုဒ်ဖြတ်ပုဒ်ရပ်များ **( ၊ )**၊ **( ။ )** သို့မဟုတ် **( ... )** ထည့်ပေးပါ။ (သို့) Enter ခေါက်၍ စာပိုဒ်ခွဲရေးပါ။
+    - **အသံကို ခဏရပ်စေရန် (Pause):** စာကြောင်းများအဆုံးတွင် **( ။ )** ပုဒ်မ ထည့်ပေးပါ။ ( ။ ) တွေ့မှသာ အသံကို သဘာဝကျကျ ခဏရပ်ပေးမည် ဖြစ်ပါသည်။
     - **အသံအသစ်များ ဖန်တီးနည်း (Pitch ကို အသုံးပြုခြင်း):**
         - 👧🏻 **ကလေးမလေးအသံ/ အသံစူးစူး:** အမျိုးသမီးအသံကို ရွေးပြီး Pitch ကို **+15** မှ **+25** ကြားထားပါ။
         - 👩🏻 **အမျိုးသမီး သတင်းကြေညာရှင်:** အမျိုးသမီးအသံ ရွေးပြီး Pitch ကို **-10** ခန့်ထားပါ။
@@ -36,7 +33,8 @@ if "audio_history" not in st.session_state:
 if "file_counter" not in st.session_state:
     st.session_state.file_counter = 1
 
-text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=200)
+# စာသားထည့်ရန်နေရာ (အရင်ကထက် ပိုကျယ်အောင် height=400 ဟု ပြင်ထားပါသည်)
+text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=400)
 
 # အသံရွေးချယ်ရန် (Radio Button)
 voice_option = st.radio("အဓိက အသံအမျိုးအစား ရွေးချယ်ပါ", ["👩🏻 အမျိုးသမီးအသံ (Nilar)", "👨🏻 အမျိုးသားအသံ (Thiha)"])
@@ -49,13 +47,15 @@ with col1:
     rate_str = f"{speed:+d}%"
 
 with col2:
-    # 🌟 အသံအသစ်များ ဖန်တီးရန် Pitch Slider အသစ် 🌟
     pitch = st.slider("အသံ ကြီး/ငယ် (Pitch)", -50, 50, 0)
     pitch_str = f"{pitch:+d}Hz"
 
 async def create_audio(text, voice, rate, pitch_val, filename):
-    # Pitch ပါ ထည့်သွင်း အလုပ်လုပ်စေရန် ပြင်ဆင်ထားသည်
-    communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch_val)
+    # စာသားကို ပြင်ဆင်ခြင်း: Enter ခေါက်ထားသည်များကို space ဖြင့်အစားထိုးပြီး၊ '။' တွေ့မှသာ ခဏရပ်ရန် ပြင်ဆင်ခြင်း
+    processed_text = text.replace('\n', ' ')
+    processed_text = processed_text.replace('။', '။\n\n') 
+
+    communicate = edge_tts.Communicate(processed_text, voice, rate=rate, pitch=pitch_val)
     await communicate.save(filename)
 
 if st.button("အသံဖန်တီးပါ (Generate Audio)"):
@@ -66,7 +66,6 @@ if st.button("အသံဖန်တီးပါ (Generate Audio)"):
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                # create_audio ထဲသို့ pitch_str ကိုပါ ထည့်သွင်းပေးပို့သည်
                 loop.run_until_complete(create_audio(text_input, voice_code, rate_str, pitch_str, current_filename))
                 
                 st.session_state.audio_history.append(current_filename)
@@ -83,7 +82,7 @@ if st.session_state.audio_history:
     st.subheader("ဖန်တီးထားသော အသံဖိုင်များ")
     st.caption("ဤနေရာတွင် ယခင်လုပ်ထားသော အသံများကို ပြန်နားထောင်နိုင်၊ ဒေါင်းလုဒ်ဆွဲနိုင်ပါသည်။")
     
-    for audio_file in reversed(st.session_state.audio_history): # အသစ်လုပ်ထားသောဖိုင်ကို အပေါ်ဆုံးတွင်ပြရန် reversed သုံးထားပါသည်
+    for audio_file in reversed(st.session_state.audio_history): 
         if os.path.exists(audio_file):
             st.write(f"🔊 **{audio_file}**")
             st.audio(audio_file, format="audio/mp3")
@@ -97,3 +96,4 @@ if st.session_state.audio_history:
                     key=audio_file
                 )
             st.write("")
+            
