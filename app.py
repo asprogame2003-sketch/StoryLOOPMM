@@ -32,7 +32,7 @@ youtube_link = "https://youtube.com/@storyloopmm?si=dzQRoGdPAj_2Quno"
 st.info(f"ဗီဒီယိုများ ဝင်ရောက်လေ့လာရန် 👉 [**▶️ StoryLOOP MM YouTube Channel သို့ သွားရန် နှိပ်ပါ**]({youtube_link})")
 st.write("---")
 
-# --- 💡 အသုံးပြုသူများအတွက် အကြံပြုချက်နှင့် လမ်းညွှန် (ပိတ်ထားပြီး နှိပ်မှပွင့်မည်) ---
+# --- 💡 အသုံးပြုသူများအတွက် အကြံပြုချက်နှင့် လမ်းညွှန် ---
 with st.expander("💡 ပိုမိုကောင်းမွန်သော အသံထွက်ရရှိရန် (ဤနေရာကိုနှိပ်၍ ဖတ်ပါ)", expanded=False):
     st.markdown("""
     - **အသံကို ခဏရပ်စေရန် (Pause):** စာကြောင်းများအဆုံးတွင် **( ။ )** ပုဒ်မ ထည့်ပေးပါ။ ( ။ ) တွေ့မှသာ အသံကို သဘာဝကျကျ (၁ စက္ကန့်ခန့်) ခဏရပ်ပေးမည် ဖြစ်ပါသည်။
@@ -57,8 +57,15 @@ if "input_text" not in st.session_state:
 def clear_text():
     st.session_state.input_text = ""
 
+# --- ZAWGYI / UNICODE ရွေးချယ်ရန် နေရာ (အသစ်ထည့်ထားသည်) ---
+font_choice = st.radio(
+    "✏️ အသုံးပြုမည့် စာသား ဖောင့် (Font) အမျိုးအစားကို ရွေးချယ်ပါ",
+    ["✅ Unicode (Pyidaungsu, Myanmar3 စသည်)", "⚠️ Zawgyi-One"]
+)
+st.caption("မှတ်ချက် - သင် ဇော်ဂျီ (Zawgyi) ဖြင့် ထည့်သွင်းထားပါက AI မှန်ကန်စွာ အသံထွက်နိုင်ရန် အလိုအလျောက် Unicode သို့ ပြောင်းလဲပေးပါမည်။")
+
 # စာသားထည့်ရန်နေရာ
-text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=400, key="input_text")
+text_input = st.text_area("ဖတ်ခိုင်းလိုသော စာသားများကို ဤနေရာတွင် ထည့်ပါ... (စာအရှည်ကြီး ထည့်လို့ရပါသည်)", height=350, key="input_text")
 
 # အသံရွေးချယ်ရန် (Radio Button)
 voice_option = st.radio("အဓိက အသံအမျိုးအစား ရွေးချယ်ပါ", ["👩🏻 အမျိုးသမီးအသံ (Nilar)", "👨🏻 အမျိုးသားအသံ (Thiha)"])
@@ -75,9 +82,7 @@ with col2:
     pitch_str = f"{pitch:+d}Hz"
 
 async def create_audio(text, voice, rate, pitch_val, filename):
-    # စာသားကို ပြင်ဆင်ခြင်း: Enter ခေါက်ထားသည်များကို space ဖြင့်အစားထိုးသည်
     processed_text = text.replace('\n', ' ')
-    # ( ။ ) တွေ့ပါက 1 စက္ကန့်ခန့် သေချာရပ်တန့်စေရန် \n\n ဖြင့် ပြန်လည်အစားထိုးထားပါသည်
     processed_text = processed_text.replace('။', '။\n\n') 
 
     communicate = edge_tts.Communicate(processed_text, voice, rate=rate, pitch=pitch_val)
@@ -94,11 +99,21 @@ if generate_clicked:
     if text_input.strip():
         current_filename = f"storyloop-{st.session_state.file_counter:07d}.mp3"
         
+        # --- ZAWGYI TO UNICODE အလိုအလျောက် ပြောင်းလဲခြင်း ---
+        final_text = text_input
+        if "Zawgyi" in font_choice:
+            try:
+                from myanmar.converter import convert
+                final_text = convert(text_input, 'zawgyi', 'unicode')
+                st.success("✨ Zawgyi စာသားများကို Unicode သို့ အလိုအလျောက် ပြောင်းလဲပေးလိုက်ပါသည်။")
+            except ImportError:
+                st.error("⚠️ အမှားအယွင်း: 'myanmar' library မရှိပါ။ requirements.txt တွင် 'myanmar' ဟု ထည့်သွင်းပေးပါ။")
+        
         with st.spinner(f"{current_filename} ကို ပြောင်းလဲနေပါသည်။ ခဏစောင့်ပါ... (ရပ်လိုပါက Refresh လုပ်ပါ)"):
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                loop.run_until_complete(create_audio(text_input, voice_code, rate_str, pitch_str, current_filename))
+                loop.run_until_complete(create_audio(final_text, voice_code, rate_str, pitch_str, current_filename))
                 
                 st.session_state.audio_history.append(current_filename)
                 st.session_state.file_counter += 1
