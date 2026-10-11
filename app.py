@@ -2,7 +2,6 @@ import streamlit as st
 import edge_tts
 import asyncio
 import os
-import time
 
 # စာမျက်နှာ ဖွဲ့စည်းပုံ
 st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣️")
@@ -11,16 +10,13 @@ st.set_page_config(page_title="StoryLOOP MM - Text to Speech", page_icon="🗣�
 st.title("Myanmar AI Voice (Unlimited)")
 st.write("ဒီ App လေးကို အားလုံး အခမဲ့ အသုံးပြုနိုင်အောင် **StoryLOOP MM** မှ ဖန်တီးပေးထားတာ ဖြစ်ပါတယ်။")
 
-# --- ဝက်ဘ်ဆိုက်ကို တစ်ခါဝင်လျှင် (၁) ကြိမ်သာ Count လုပ်ရန် မှတ်သားခြင်း ---
-if "visit_id" not in st.session_state:
-    st.session_state.visit_id = str(int(time.time()))
-
-# --- 👀 View Counter (Browser တွင် ငြိမနေစေရန်နှင့် ၁ ကြိမ်ဝင် ၁ ကြိမ်သာတက်ရန် ပြင်ထားပါသည်) ---
+# --- 👀 View Counter (Streamlit တွင် အလုပ်လုပ်သော ကောင်တာအသစ်သို့ ပြောင်းထားပါသည်) ---
+# ဤ Counter သည် (ယနေ့ဝင်ကြည့်သူ / စုစုပေါင်း ဝင်ကြည့်သူ) ကို ပြပေးမည်ဖြစ်ပါသည်။
 st.markdown(
-    f"""
+    """
     <div style="text-align: center; margin-top: 5px; margin-bottom: 20px;">
         <p style="font-size: 14px; color: gray;">👀 ဝက်ဘ်ဆိုက် ဝင်ရောက်ကြည့်ရှုမှု (Total Views)</p>
-        <img src="https://komarev.com/ghpvc/?username=storyloopmm-tts-app&label=Views&color=2ea44f&style=flat-square&t={st.session_state.visit_id}" alt="View Counter">
+        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://storyloopmm.streamlit.app&count_bg=%232EA44F&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true" alt="View Counter">
     </div>
     """,
     unsafe_allow_html=True
@@ -67,9 +63,10 @@ with col2:
     pitch_str = f"{pitch:+d}Hz"
 
 async def create_audio(text, voice, rate, pitch_val, filename):
-    # စာသားကို ပြင်ဆင်ခြင်း: Enter ခေါက်ထားသည်များကို space ဖြင့်အစားထိုးပြီး၊ '။' တွေ့မှသာ ခဏရပ်ရန် ပြင်ဆင်ခြင်း
+    # စာသားကို ပြင်ဆင်ခြင်း: Enter ခေါက်ထားသည်များကို space ဖြင့်အစားထိုးသည်
     processed_text = text.replace('\n', ' ')
-    processed_text = processed_text.replace('။', '။\n\n') 
+    # အရင်က 1 စက္ကန့်ကြာအောင် ရပ်စေသော '\n\n' ကိုဖြုတ်ပြီး သဘာဝကျကျ (0.5s ခန့်) သာရပ်ရန် '။ ' ဖြင့်သာ အစားထိုးထားပါသည်
+    processed_text = processed_text.replace('။', '။ ') 
 
     communicate = edge_tts.Communicate(processed_text, voice, rate=rate, pitch=pitch_val)
     await communicate.save(filename)
